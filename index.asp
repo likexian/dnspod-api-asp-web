@@ -18,34 +18,23 @@ Set dnspod_api = new dnspod
 action = Trim(Request.QueryString("action"))
 
 If action = "domainlist" Then
-    If Request.Form("login_code") = "" Then
-        If Request.Form("login_email") = "" Then
-            If Session("login_email") = "" Then
-                dnspod_api.Message "danger", "请输入登录账号。", -1
-            End If
-        Else
-            Session("login_email") = Request.Form("login_email")
+    If Request.Form("token_id") = "" Then
+        If Session("token_id") = "" Then
+            dnspod_api.Message "danger", "请输入Token ID。", -1
         End If
-
-        If Request.Form("login_password") = "" Then
-            If Session("login_password") = "" Then
-                dnspod_api.Message "danger", "请输入登录密码。", -1
-            End If
-        Else
-            Session("login_password") = Request.Form("login_password")
-        End If
-
-        Session("login_code") = ""
     Else
-        Session("login_code") = Request.Form("login_code")
+        Session("token_id") = Request.Form("token_id")
+    End If
+
+    If Request.Form("token_key") = "" Then
+        If Session("token_key") = "" Then
+            dnspod_api.Message "danger", "请输入Token Key。", -1
+        End If
+    Else
+        Session("token_key") = Request.Form("token_key")
     End If
 
     Set objXML = dnspod_api.ApiCall("Domain.List", "")
-    Set objNodes = objXML.getElementsByTagName("dnspod/status")
-    If objNodes(0).selectSingleNode("code").Text = "50" Then
-        Response.Redirect("index.asp?action=logind")
-        Response.End
-    End If
 
     List = ""
     DomainSub = dnspod_api.ReadText("./template/domain_sub.html")
@@ -88,13 +77,7 @@ ElseIf action = "domainstatus" Then
         dnspod_api.Message "danger", "参数错误。", -1
     End If
 
-    Session("login_code") = Request.Form("login_code")
     Set objXML = dnspod_api.ApiCall("Domain.Status", "domain_id=" & Request.QueryString("domain_id") & "&status=" & Request.QueryString("status"))
-    Set objNodes = objXML.getElementsByTagName("dnspod/status")
-    If objNodes(0).selectSingleNode("code").Text = "50" Then
-        Response.Redirect("index.asp?action=domainstatusd&domain_id=" & Request.QueryString("domain_id") & "&status=" & Request.QueryString("status"))
-        Response.End
-    End If
 
     If Request.QueryString("status") = "enable" Then
         Status = "启用"
@@ -108,13 +91,7 @@ ElseIf action = "domainremove" Then
         dnspod_api.Message "danger", "参数错误。", -1
     End If
 
-    Session("login_code") = Request.Form("login_code")
     Set objXML = dnspod_api.ApiCall("Domain.Remove", "domain_id=" & Request.QueryString("domain_id"))
-    Set objNodes = objXML.getElementsByTagName("dnspod/status")
-    If objNodes(0).selectSingleNode("code").Text = "50" Then
-        Response.Redirect("index.asp?action=domainremoved&domain_id=" & Request.QueryString("domain_id"))
-        Response.End
-    End If
 
     dnspod_api.Message "success", "删除成功。", "index.asp?action=domainlist"
 ElseIf action = "recordlist" Then
@@ -364,35 +341,6 @@ ElseIf action = "recordstatus" Then
     End If
 
     dnspod_api.Message "success",  Status & "成功。", "index.asp?action=recordlist&domain_id=" & Request.QueryString("domain_id")
-ElseIf action = "domainstatusd" Then
-    If Request.QueryString("domain_id") = "" Then
-        dnspod_api.Message "danger", "参数错误。", -1
-    End If
-    If Request.QueryString("status") = "" Then
-        dnspod_api.Message "danger", "参数错误。", -1
-    End If
-    If Request.QueryString("status") = "enable" Then
-        Status = "启用"
-    Else
-        Status = "暂停"
-    End If
-    Text = dnspod_api.GetTemplate("logind")
-    Text = Replace(Text, "{{title}}", "域名" & Status)
-    Text = Replace(Text, "{{action}}", "domainstatus&domain_id=" & Request.QueryString("domain_id") & "&status=" & Request.QueryString("status"))
-ElseIf action = "domainremoved" Then
-    If Request.QueryString("domain_id") = "" Then
-        dnspod_api.Message "danger", "参数错误。", -1
-    End If
-    Text = dnspod_api.GetTemplate("logind")
-    Text = Replace(Text, "{{title}}", "域名删除")
-    Text = Replace(Text, "{{action}}", "domainremove&domain_id=" & Request.QueryString("domain_id"))
-ElseIf action = "logind" Then
-    If Session("login_email") = "" Or Session("login_password") = "" Then
-        dnspod_api.Message "danger", "参数错误。", -1
-    End If
-    Text = dnspod_api.GetTemplate("logind")
-    Text = Replace(Text, "{{title}}", "用户登录")
-    Text = Replace(Text, "{{action}}", "domainlist")
 Else
     Text = dnspod_api.GetTemplate("login")
     Text = Replace(Text, "{{title}}", "用户登录")

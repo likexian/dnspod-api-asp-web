@@ -35,7 +35,7 @@ Class dnspod
     Public Function ApiCall(strApi, strData)
     On Error Resume Next
         strApi = "https://dnsapi.cn/" & strApi
-        strData = "login_email=" & Session("login_email") & "&login_password=" & Session("login_password") & "&login_code=" & Session("login_code") & "&format=xml&lang=cn&error_on_empty=no&" & strData
+        strData = "login_token=" & Session("token_id") & "," & Session("token_key") & "&format=xml&lang=cn&error_on_empty=no&" & strData
 
         strResult = PostData(strApi, strData, Session("cookies"))
         If strResult = "" Then
@@ -44,7 +44,7 @@ Class dnspod
 
         Set objRoot = GetRootNode(strResult)
         Set objNodes = objRoot.getElementsByTagName("dnspod/status")
-        If objNodes(0).selectSingleNode("code").Text <> 1 And objNodes(0).selectSingleNode("code").Text <> 50 Then
+        If objNodes(0).selectSingleNode("code").Text <> 1 Then
             Message "danger", objNodes(0).selectSingleNode("message").Text, ""
         End If
         Set objNodes = Nothing
@@ -129,7 +129,6 @@ Class dnspod
                     End If
                 Next
                 If Cookies <> "" Then
-                    Session("login_code") = ""
                     Session("cookies") = Left(Cookies, Len(Cookies) - 1)
                 End If
             End If
