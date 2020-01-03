@@ -172,18 +172,18 @@ ElseIf action = "recordcreatef" Then
         Next
     End If
 
-    If Session("line_" & Request.QueryString("grade")) = "" Then
-        Set objXML = dnspod_api.ApiCall("Record.Line", "domain_grade=" & Request.QueryString("grade"))
+    If Session("line_" & Request.QueryString("domain_id")) = "" Then
+        Set objXML = dnspod_api.ApiCall("Record.Line", "domain_id=" & Request.QueryString("domain_id") & "&domain_grade=" & Request.QueryString("grade"))
         Set objNodes = objXML.getElementsByTagName("dnspod/lines/item")
         LineList = ""
         For i = 0 To objNodes.Length - 1
             LineList = LineList & objNodes(i).Text & ","
         Next
-        Session("line_" & Request.QueryString("grade")) = Left(LineList, Len(LineList) - 1)
+        Session("line_" & Request.QueryString("domain_id")) = Left(LineList, Len(LineList) - 1)
     End If
 
-    If Session("line_" & Request.QueryString("grade")) <> "" Then
-        Lines = Split(Session("line_" & Request.QueryString("grade")), ",")
+    If Session("line_" & Request.QueryString("domain_id")) <> "" Then
+        Lines = Split(Session("line_" & Request.QueryString("domain_id")), ",")
         LineList = ""
         For i = 0 To UBound(Lines)
             LineList = LineList & "<option value=""" & Lines(i) & """>" & Lines(i) & "</option>"
@@ -259,18 +259,18 @@ ElseIf action = "recordeditf" Then
         Next
     End If
 
-    If Session("line_" & Request.QueryString("grade")) = "" Then
-        Set objXML = dnspod_api.ApiCall("Record.Line", "domain_grade=" & Request.QueryString("grade"))
+    If Session("line_" & Request.QueryString("domain_id")) = "" Then
+        Set objXML = dnspod_api.ApiCall("Record.Line", "domain_id=" & Request.QueryString("domain_id") & "&domain_grade=" & Request.QueryString("grade"))
         Set objNodes = objXML.getElementsByTagName("dnspod/lines/item")
         LineList = ""
         For i = 0 To objNodes.Length - 1
             LineList = LineList & objNodes(i).Text & ","
         Next
-        Session("line_" & Request.QueryString("grade")) = Left(LineList, Len(LineList) - 1)
+        Session("line_" & Request.QueryString("domain_id")) = Left(LineList, Len(LineList) - 1)
     End If
 
-    If Session("line_" & Request.QueryString("grade")) <> "" Then
-        Lines = Split(Session("line_" & Request.QueryString("grade")), ",")
+    If Session("line_" & Request.QueryString("domain_id")) <> "" Then
+        Lines = Split(Session("line_" & Request.QueryString("domain_id")), ",")
         LineList = ""
         For i = 0 To UBound(Lines)
             If objRecords(0).selectSingleNode("record_line").Text = Lines(i) Then
