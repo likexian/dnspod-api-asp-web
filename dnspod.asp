@@ -55,7 +55,7 @@ Class dnspod
         Set objRoot = GetRootNode(strResult)
         Set objNodes = objRoot.getElementsByTagName("dnspod/status")
         If objNodes(0).selectSingleNode("code").Text <> 1 Then
-            Message "danger", objNodes(0).selectSingleNode("message").Text, ""
+            Message "danger", objNodes(0).selectSingleNode("message").Text, "-1"
         End If
         Set objNodes = Nothing
 
