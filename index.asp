@@ -140,6 +140,7 @@ ElseIf action = "recordlist" Then
         ListSub = Replace(ListSub, "{{status_text}}", StatusText)
         ListSub = Replace(ListSub, "{{mx}}", MX)
         ListSub = Replace(ListSub, "{{ttl}}", objNodes(i).selectSingleNode("ttl").Text)
+        ListSub = Replace(ListSub, "{{remark}}", objNodes(i).selectSingleNode("remark").Text)
         List = List & ListSub
     Next
 
@@ -201,6 +202,7 @@ ElseIf action = "recordcreatef" Then
     Text = Replace(Text, "{{value}}", "")
     Text = Replace(Text, "{{mx}}", "10")
     Text = Replace(Text, "{{ttl}}", "600")
+    Text = Replace(Text, "{{remark}}", "")
 ElseIf action = "recordcreate" Then
     If Request.QueryString("domain_id") = "" Then
         dnspod_api.Message "danger", "参数错误。", -1
@@ -223,6 +225,11 @@ ElseIf action = "recordcreate" Then
     End If
 
     Set objXML = dnspod_api.ApiCall("Record.Create", "domain_id=" & Request.QueryString("domain_id") & "&sub_domain=" & Request.Form("sub_domain") & "&record_type=" & Request.Form("type") & "&record_line=" & Request.Form("line") & "&value=" & Request.Form("value") & "&mx=" & Request.Form("mx") & "&ttl=" & Request.Form("ttl"))
+
+    If Request.Form("remark") <> "" Then
+        Set objRecords = objXML.getElementsByTagName("dnspod/record")
+        Set objXML = dnspod_api.ApiCall("Record.Remark", "domain_id=" & Request.QueryString("domain_id") & "&record_id=" & objRecords(0).selectSingleNode("id").Text & "&remark=" & Request.Form("remark"))
+    End If
 
     dnspod_api.Message "success", "添加成功。", "index.asp?action=recordlist&domain_id=" & Request.QueryString("domain_id")
 ElseIf action = "recordeditf" Then
@@ -293,6 +300,7 @@ ElseIf action = "recordeditf" Then
     Text = Replace(Text, "{{value}}", objRecords(0).selectSingleNode("value").Text)
     Text = Replace(Text, "{{mx}}", objRecords(0).selectSingleNode("mx").Text)
     Text = Replace(Text, "{{ttl}}", objRecords(0).selectSingleNode("ttl").Text)
+    Text = Replace(Text, "{{remark}}", objRecords(0).selectSingleNode("remark").Text)
 ElseIf action = "recordedit" Then
     If Request.QueryString("domain_id") = "" Then
         dnspod_api.Message "danger", "参数错误。", -1
@@ -318,6 +326,10 @@ ElseIf action = "recordedit" Then
     End If
 
     Set objXML = dnspod_api.ApiCall("Record.Modify", "domain_id=" & Request.QueryString("domain_id") & "&record_id=" & Request.QueryString("record_id") & "&sub_domain=" & Request.Form("sub_domain") & "&record_type=" & Request.Form("type") & "&record_line=" & Request.Form("line") & "&value=" & Request.Form("value") & "&mx=" & Request.Form("mx") & "&ttl=" & Request.Form("ttl"))
+
+    If Request.Form("remark") <> Request.Form("oremark") Then
+        Set objXML = dnspod_api.ApiCall("Record.Remark", "domain_id=" & Request.QueryString("domain_id") & "&record_id=" & Request.QueryString("record_id") & "&remark=" & Request.Form("remark"))
+    End If
 
     dnspod_api.Message "success", "修改成功。", "index.asp?action=recordlist&domain_id=" & Request.QueryString("domain_id")
 ElseIf action = "recordremove" Then
