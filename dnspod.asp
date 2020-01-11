@@ -121,7 +121,7 @@ Class dnspod
             .Open "post", strUrl, False, "", ""
             .SetRequestHeader "Content-Length", Len(strData)
             .SetRequestHeader "Content-Type", "application/x-www-form-urlencoded"
-            .SetRequestHeader "User-Agent", "DNSPod API ASP Web Client/1.0.0 (i@likexian.com)"
+            .SetRequestHeader "User-Agent", "DNSPod API ASP Web Client/2.0.0 (+https://www.likexian.com/)"
             If strCookies <> "" Then
                 .SetRequestHeader "Cookie", strCookies
             End If
